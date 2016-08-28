@@ -228,6 +228,69 @@ class DBFunctions
         $ret['error'] = $error;
         return $ret;
     }
+
+    /**
+     * Modifying room.
+     * @param $roomname
+     * @param $beds
+     * @param $size
+     * @param $tv
+     * @return array
+     */
+    public function modifyRoom($roomname, $beds, $size, $tv, $id) {
+        $ret = array();
+        $error = '';
+        if($this->isDbAlive())
+        {
+            $roomname = mysqli_real_escape_string($this->connection, $roomname);
+            $beds = mysqli_real_escape_string($this->connection, $beds);
+            $size = mysqli_real_escape_string($this->connection, $size);
+            $tv = mysqli_real_escape_string($this->connection, $tv);
+            $id = mysqli_real_escape_string($this->connection, $id);
+
+            $query = "UPDATE room SET ROOMNAME = ?, BEDS = ?, SIZE = ?, TV = ? WHERE ID = ?";
+            $stmt = $this->connection->prepare($query);
+            $stmt->bind_param("sssss", $roomname, $beds, $size, $tv, $id);
+            $stmt->execute();
+            echo $stmt->error;
+            echo $this->connection->error;
+
+            $ret['status'] = 'OK';
+            $ret['updated'] = 1;
+            return $ret;
+        }
+        else
+        {
+            $error .= 'Konekcija ka bazi podataka nije otvorena.';
+        }
+        $ret['status'] = 'ERROR';
+        $ret['error'] = $error;
+        return $ret;
+    }
+
+    public function deleteRoom($id) {
+        $ret = array();
+        $error = '';
+        if($this->isDbAlive())
+        {
+            $query = "DELETE FROM room WHERE ID = ?";
+            $stmt = $this->connection->prepare($query);
+            $stmt->bind_param("s", $id);
+            $stmt->execute();
+
+
+            $ret['status'] = 'OK';
+            $ret['deleted'] = 1;
+            return $ret;
+        }
+        else
+        {
+            $error .= 'Konekcija ka bazi podataka nije otvorena.';
+        }
+        $ret['status'] = 'ERROR';
+        $ret['error'] = $error;
+        return $ret;
+    }
 }
 
 ?>
